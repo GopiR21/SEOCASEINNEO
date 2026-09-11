@@ -7,20 +7,22 @@
 
     <title>Case S-9375</title>
 
-    <link rel="icon"
-          href="https://amicorpcapitalmanagement.es/wp-content/uploads/2025/09/favicon.jpg"
-          type="image/jpeg">
-
     <style>
         * {
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
             background: #f5f7fa;
-            color: #1a1a2e;
         }
 
         #embed-container {
@@ -30,34 +32,40 @@
 
         #error-banner {
             display: none;
-            margin: 1rem;
-            padding: 1rem;
+            margin: 20px;
+            padding: 15px;
             background: #fde8e8;
             color: #9b1c1c;
-            border-radius: 6px;
             border: 1px solid #f5c6c6;
+            border-radius: 6px;
         }
 
         #error-banner.visible {
             display: block;
         }
+
+        pega-embed {
+            display: block;
+            width: 100%;
+        }
     </style>
 
-    <!-- Pega Web Mashup JavaScript -->
+    <!-- Pega Web Mashup JavaScript Library -->
     <script src="https://devportal.amicorp.com/prweb/PRRestService/c11nsvc/v1/pega-embed.js"></script>
 
 </head>
 
+
 <body>
 
     <!-- Error message -->
-    <div id="error-banner"
-         role="alert"
-         aria-live="polite">
+    <div id="error-banner" role="alert">
     </div>
 
-    <!-- Pega Embed will be added here -->
-    <div id="embed-container"></div>
+
+    <!-- Pega Embed will be created and inserted here -->
+    <div id="embed-container">
+    </div>
 
 
     <script>
@@ -68,37 +76,48 @@
 
 
             /*
-             * Pega configuration
+             * =========================================================
+             * Pega Web Mashup Configuration
+             * =========================================================
              */
+
             var PEGA_CONFIG = {
 
+                // Tell Pega that we want to open a Case
                 action: "openCase",
 
+                // Case that we want to open
                 caseID: "S-9375",
 
+                // Pega Theme
                 themeID: "ClientPortalCS",
 
+                // Display the complete Case page
                 casePage: "full",
 
+                // Pega Application
                 appAlias: "CLMSCSDev",
 
+                // Pega Server
                 pegaServerUrl: "https://devportal.amicorp.com/prweb/",
 
-                autoReauth: "true",
+                // Authentication configuration
+                grantType: "customBearer",
 
-                authService: "pega",
-
+                // Web Mashup client ID
                 clientId: "22047533690484659444"
-
             };
 
 
             /*
-             * Logging function
+             * =========================================================
+             * Logging Function
+             * =========================================================
              */
+
             function log(level, message, detail) {
 
-                var prefix = "[AmicorpCaseBridge]";
+                var prefix = "[PegaCaseMashup]";
 
                 if (detail !== undefined) {
 
@@ -119,47 +138,58 @@
 
 
             /*
-             * Display error message
+             * =========================================================
+             * Show Error
+             * =========================================================
              */
+
             function showError(message) {
 
-                var banner =
+                var errorBanner =
                     document.getElementById("error-banner");
 
-                if (!banner) {
+
+                if (!errorBanner) {
 
                     log("error", message);
 
                     return;
                 }
 
-                banner.textContent = message;
 
-                banner.classList.add("visible");
+                errorBanner.textContent = message;
+
+                errorBanner.classList.add("visible");
             }
 
 
             /*
+             * =========================================================
              * Create Pega Embed
+             * =========================================================
              */
+
             function createPegaEmbed() {
 
                 /*
-                 * Create <pega-embed>
+                 * Create the <pega-embed> HTML element dynamically
                  */
                 var embed =
                     document.createElement("pega-embed");
 
 
                 /*
-                 * Give the embed an ID
+                 * Give the Pega Embed an ID
                  */
                 embed.id = "theEmbed";
 
 
                 /*
-                 * Pega action
+                 * -----------------------------------------------------
+                 * Pass Pega Configuration to <pega-embed>
+                 * -----------------------------------------------------
                  */
+
                 embed.setAttribute(
                     "action",
                     PEGA_CONFIG.action
@@ -167,7 +197,9 @@
 
 
                 /*
-                 * Case ID
+                 * Pass Case ID
+                 *
+                 * S-9375
                  */
                 embed.setAttribute(
                     "caseID",
@@ -176,7 +208,7 @@
 
 
                 /*
-                 * Theme
+                 * Pass Theme
                  */
                 embed.setAttribute(
                     "themeID",
@@ -185,7 +217,7 @@
 
 
                 /*
-                 * Case page
+                 * Pass Case Page configuration
                  */
                 embed.setAttribute(
                     "casePage",
@@ -194,7 +226,7 @@
 
 
                 /*
-                 * Pega application
+                 * Pass Pega Application
                  */
                 embed.setAttribute(
                     "appAlias",
@@ -203,7 +235,7 @@
 
 
                 /*
-                 * Pega server
+                 * Pass Pega Server URL
                  */
                 embed.setAttribute(
                     "pegaServerUrl",
@@ -212,25 +244,16 @@
 
 
                 /*
-                 * Automatically re-authenticate
+                 * Pass authentication grant type
                  */
                 embed.setAttribute(
-                    "autoReauth",
-                    PEGA_CONFIG.autoReauth
+                    "grantType",
+                    PEGA_CONFIG.grantType
                 );
 
 
                 /*
-                 * Pega authentication service
-                 */
-                embed.setAttribute(
-                    "authService",
-                    PEGA_CONFIG.authService
-                );
-
-
-                /*
-                 * Client ID
+                 * Pass Web Mashup client ID
                  */
                 embed.setAttribute(
                     "clientId",
@@ -239,51 +262,68 @@
 
 
                 /*
-                 * Full width
+                 * Set width
                  */
                 embed.style.width = "100%";
 
 
                 /*
-                 * Handle Pega Embed errors
+                 * -----------------------------------------------------
+                 * Handle Pega Embed Error
+                 * -----------------------------------------------------
                  */
+
                 embed.addEventListener(
                     "error",
                     function (event) {
 
                         log(
                             "error",
-                            "pega-embed reported an error.",
+                            "Pega Embed reported an error.",
                             event
                         );
 
+
                         showError(
-                            "Unable to open Case S-9375. Please check the Case ID or try again later."
+                            "Unable to open Case S-9375. " +
+                            "Please check the Case ID and access permissions."
                         );
 
                     }
                 );
 
 
+                /*
+                 * Return the completed Pega Embed
+                 */
                 return embed;
             }
 
 
             /*
+             * =========================================================
              * Load Pega Case
+             * =========================================================
              */
+
             function loadPegaCase() {
 
+                /*
+                 * Find the HTML container
+                 */
                 var embedContainer =
                     document.getElementById(
                         "embed-container"
                     );
 
 
+                /*
+                 * Make sure the container exists
+                 */
                 if (!embedContainer) {
 
                     throw new Error(
-                        "Embed container #embed-container not found."
+                        "Embed container not found."
                     );
                 }
 
@@ -296,60 +336,73 @@
 
 
                 /*
-                 * Add Pega Embed to the page
+                 * Add Pega Embed to the HTML page
                  */
                 embedContainer.appendChild(
                     embed
                 );
 
 
+                /*
+                 * Log information in browser console
+                 */
                 log(
                     "info",
-                    "Pega Case embed created.",
+                    "Pega Embed created successfully.",
                     {
                         action: PEGA_CONFIG.action,
-                        caseID: PEGA_CONFIG.caseID
+                        caseID: PEGA_CONFIG.caseID,
+                        appAlias: PEGA_CONFIG.appAlias,
+                        pegaServerUrl: PEGA_CONFIG.pegaServerUrl
                     }
                 );
-
             }
 
 
             /*
+             * =========================================================
              * Initialize Web Mashup
+             * =========================================================
              */
+
             function init() {
 
                 log(
                     "info",
-                    "Initializing Pega openCase mashup."
+                    "Initializing Pega Case Web Mashup."
                 );
 
 
                 try {
 
+                    /*
+                     * Start loading Case S-9375
+                     */
                     loadPegaCase();
 
-                } catch (err) {
+                } catch (error) {
 
                     log(
                         "error",
-                        "Initialization failed.",
-                        err
+                        "Pega Web Mashup initialization failed.",
+                        error
                     );
+
 
                     showError(
-                        "Something went wrong while starting the Pega Case."
+                        "Something went wrong while loading " +
+                        "Case S-9375."
                     );
-
                 }
-
             }
 
 
             /*
-             * Start when page is ready
+             * =========================================================
+             * Start JavaScript After HTML Is Loaded
+             * =========================================================
              */
+
             if (
                 document.readyState === "loading"
             ) {
