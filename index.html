@@ -3,34 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case – Not Found</title>
-    <link rel="icon" href="https://amicorpcapitalmanagement.es/wp-content/uploads/2025/09/favicon.jpg" type="image/jpeg">
+    <title>Case S-9375</title>
+
+    <link rel="icon"
+          href="https://amicorpcapitalmanagement.es/wp-content/uploads/2025/09/favicon.jpg"
+          type="image/jpeg">
+
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             background: #f5f7fa;
             color: #1a1a2e;
         }
-        #embed-container { width: 100%; }
-        #embed-container:not(:empty) { min-height: 100vh; }
-        #embed-container.hidden { display: none; }
-        #default-homepage {
-            display: none;
-            max-width: 640px;
-            margin: 1rem auto 2rem;
-            padding: 2rem;
-            text-align: center;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+        #embed-container {
+            width: 100%;
+            min-height: 100vh;
         }
-        #default-homepage.visible { display: block; }
-        #default-homepage h1 {
-            margin: 0 0 0.75rem;
-            font-size: 1.5rem;
-        }
+
         #error-banner {
             display: none;
             margin: 1rem;
@@ -40,26 +35,30 @@
             border-radius: 6px;
             border: 1px solid #f5c6c6;
         }
-        #error-banner.visible { display: block; }
+
+        #error-banner.visible {
+            display: block;
+        }
     </style>
+
+    <!-- Pega Web Mashup JavaScript -->
     <script src="https://devportal.amicorp.com/prweb/PRRestService/c11nsvc/v1/pega-embed.js"></script>
 </head>
+
 <body>
+
     <div id="error-banner" role="alert" aria-live="polite"></div>
 
-    <div id="default-homepage" aria-hidden="true">
-        <h1>Case – Not Found</h1>
-        <p>Open this page with a valid case ID in the URL.</p>
-    </div>
-
-    <div id="embed-container" class="hidden"></div>
+    <!-- Pega Case will be loaded here -->
+    <div id="embed-container"></div>
 
     <script>
         (function () {
             "use strict";
 
-            var DEFAULT_PAGE_TITLE = "Case – Not Found";
-
+            /*
+             * Pega Web Mashup configuration
+             */
             var PEGA_CONFIG = {
                 action: "openCase",
                 themeID: "ClientPortalCS",
@@ -69,8 +68,18 @@
                 grantType: "none"
             };
 
+            /*
+             * Hard-coded Pega Case ID
+             */
+            var CASE_ID = "S-9375";
+
+
+            /*
+             * Simple logging function
+             */
             function log(level, message, detail) {
                 var prefix = "[AmicorpCaseBridge]";
+
                 if (detail !== undefined) {
                     console[level](prefix, message, detail);
                 } else {
@@ -78,149 +87,191 @@
                 }
             }
 
+
+            /*
+             * Display error message
+             */
             function showError(message) {
                 var banner = document.getElementById("error-banner");
+
                 if (!banner) {
                     log("error", message);
                     return;
                 }
+
                 banner.textContent = message;
                 banner.classList.add("visible");
             }
 
-            function showDefaultHomepage() {
-                var homepage = document.getElementById("default-homepage");
-                var embedContainer = document.getElementById("embed-container");
 
-                if (embedContainer) {
-                    embedContainer.innerHTML = "";
-                    embedContainer.classList.add("hidden");
-                }
-                if (homepage) {
-                    homepage.classList.add("visible");
-                    homepage.setAttribute("aria-hidden", "false");
-                }
-                document.title = DEFAULT_PAGE_TITLE;
-                log("info", "Showing default homepage (no case ID).");
-            }
-
-            function decodeBase64Id(encoded) {
-                var normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
-                var padding = normalized.length % 4;
-                if (padding) {
-                    normalized += "====".slice(padding);
-                }
-                return atob(normalized);
-            }
-
-            function looksLikeBase64(value) {
-                return /^[A-Za-z0-9\-_+/]+=*$/.test(value) && value.length >= 8;
-            }
-
-            /**
-             * Supports:
-             *   ?id=<base64-encoded-caseID>   (same pattern as your KYC page)
-             *   ?caseID=<plain-caseID>
-             *   ?id=<plain-caseID>            (fallback if not valid base64)
+            /*
+             * Create the Pega Embed
              */
-            function getCaseIdFromUrl() {
-                var params = new URLSearchParams(window.location.search);
-                var plainCaseId = (params.get("caseID") || params.get("caseId") || "").trim();
-                if (plainCaseId) {
-                    log("info", "Case ID from caseID param:", plainCaseId);
-                    return plainCaseId;
-                }
-
-                var encodedId = (params.get("id") || "").trim();
-                if (!encodedId) {
-                    log("info", "No id/caseID query parameter in URL.");
-                    return null;
-                }
-
-                if (looksLikeBase64(encodedId)) {
-                    try {
-                        var decoded = decodeBase64Id(encodedId).trim();
-                        if (decoded) {
-                            log("info", "Case ID decoded from base64:", decoded);
-                            return decoded;
-                        }
-                    } catch (err) {
-                        log("warn", "Base64 decode failed; treating id as plain case ID.", err);
-                    }
-                }
-
-                log("info", "Using plain id as case ID:", encodedId);
-                return encodedId;
-            }
-
             function createPegaEmbed(caseId) {
+
                 var embed = document.createElement("pega-embed");
+
+                /*
+                 * Give the embed an ID
+                 */
                 embed.id = "theEmbed";
-                embed.setAttribute("action", PEGA_CONFIG.action);
-                embed.setAttribute("caseID", caseId);
-                embed.setAttribute("themeID", PEGA_CONFIG.themeID);
-                embed.setAttribute("casePage", PEGA_CONFIG.casePage);
-                embed.setAttribute("appAlias", PEGA_CONFIG.appAlias);
-                embed.setAttribute("pegaServerUrl", PEGA_CONFIG.pegaServerUrl);
-                embed.setAttribute("grantType", PEGA_CONFIG.grantType);
+
+                /*
+                 * Tell Pega that we want to open a Case
+                 */
+                embed.setAttribute(
+                    "action",
+                    PEGA_CONFIG.action
+                );
+
+                /*
+                 * Pass the Case ID to Pega Embed
+                 */
+                embed.setAttribute(
+                    "caseID",
+                    caseId
+                );
+
+                /*
+                 * Pass remaining Pega configuration
+                 */
+                embed.setAttribute(
+                    "themeID",
+                    PEGA_CONFIG.themeID
+                );
+
+                embed.setAttribute(
+                    "casePage",
+                    PEGA_CONFIG.casePage
+                );
+
+                embed.setAttribute(
+                    "appAlias",
+                    PEGA_CONFIG.appAlias
+                );
+
+                embed.setAttribute(
+                    "pegaServerUrl",
+                    PEGA_CONFIG.pegaServerUrl
+                );
+
+                embed.setAttribute(
+                    "grantType",
+                    PEGA_CONFIG.grantType
+                );
+
+                /*
+                 * Make the embed occupy the full width
+                 */
                 embed.style.width = "100%";
 
+
+                /*
+                 * Handle Pega Embed errors
+                 */
                 embed.addEventListener("error", function (event) {
-                    log("error", "pega-embed reported an error.", event);
-                    showError("Unable to open this case. Please check the case ID or try again later.");
-                    showDefaultHomepage();
+
+                    log(
+                        "error",
+                        "pega-embed reported an error.",
+                        event
+                    );
+
+                    showError(
+                        "Unable to open Case S-9375. Please check the Case ID or try again later."
+                    );
                 });
+
 
                 return embed;
             }
 
-            function loadPegaEmbed(caseId) {
-                var homepage = document.getElementById("default-homepage");
-                var embedContainer = document.getElementById("embed-container");
+
+            /*
+             * Load the Pega Case
+             */
+            function loadPegaCase() {
+
+                var embedContainer =
+                    document.getElementById("embed-container");
 
                 if (!embedContainer) {
-                    throw new Error("Embed container #embed-container not found.");
+
+                    throw new Error(
+                        "Embed container #embed-container not found."
+                    );
                 }
 
-                if (homepage) {
-                    homepage.classList.remove("visible");
-                    homepage.setAttribute("aria-hidden", "true");
-                }
 
-                embedContainer.classList.remove("hidden");
-                document.title = "Case " + caseId;
+                /*
+                 * Create Pega Embed using S-9375
+                 */
+                var embed = createPegaEmbed(CASE_ID);
 
-                var embed = createPegaEmbed(caseId);
+
+                /*
+                 * Put Pega Embed inside the HTML page
+                 */
                 embedContainer.appendChild(embed);
 
-                log("info", "pega-embed created.", {
-                    action: PEGA_CONFIG.action,
-                    caseID: caseId
-                });
+
+                log(
+                    "info",
+                    "Pega Case embed created.",
+                    {
+                        action: PEGA_CONFIG.action,
+                        caseID: CASE_ID
+                    }
+                );
             }
 
+
+            /*
+             * Start the Web Mashup
+             */
             function init() {
-                log("info", "Initializing openCase mashup.");
+
+                log(
+                    "info",
+                    "Initializing Pega Case Web Mashup."
+                );
+
                 try {
-                    var caseId = getCaseIdFromUrl();
-                    if (!caseId) {
-                        showDefaultHomepage();
-                        return;
-                    }
-                    loadPegaEmbed(caseId);
+
+                    loadPegaCase();
+
                 } catch (err) {
-                    log("error", "Initialization failed.", err);
-                    showError("Something went wrong while starting the page. See the browser console for details.");
-                    showDefaultHomepage();
+
+                    log(
+                        "error",
+                        "Initialization failed.",
+                        err
+                    );
+
+                    showError(
+                        "Something went wrong while starting the Pega Case."
+                    );
                 }
             }
 
+
+            /*
+             * Wait until the HTML page is loaded
+             */
             if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", init);
+
+                document.addEventListener(
+                    "DOMContentLoaded",
+                    init
+                );
+
             } else {
+
                 init();
             }
+
         })();
     </script>
+
 </body>
 </html>
